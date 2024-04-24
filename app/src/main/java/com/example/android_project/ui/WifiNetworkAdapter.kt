@@ -1,8 +1,7 @@
-package com.example.android_project
+package com.example.android_project.ui
 
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_project.R
+import com.example.android_project.data.entities.WifiNetwork
 
 class WifiNetworkAdapter(private val context: Context, private val wifiNetworks: List<WifiNetwork>) : RecyclerView.Adapter<WifiNetworkAdapter.ViewHolder>() {
 

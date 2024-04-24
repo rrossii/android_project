@@ -1,10 +1,11 @@
-package com.example.android_project
+package com.example.android_project.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.example.android_project.R
 
 class AddNetworkActivity : AppCompatActivity() {
     private lateinit var cancelBtn: Button

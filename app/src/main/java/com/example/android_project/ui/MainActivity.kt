@@ -1,4 +1,4 @@
-package com.example.android_project
+package com.example.android_project.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import com.example.android_project.R
+import com.example.android_project.data.daos.WifiNetworkDao
+import com.example.android_project.data.WifiNetworkDatabase
+import com.example.android_project.data.entities.WifiNetwork
 
 class MainActivity : AppCompatActivity() {
     private lateinit var db: WifiNetworkDatabase
