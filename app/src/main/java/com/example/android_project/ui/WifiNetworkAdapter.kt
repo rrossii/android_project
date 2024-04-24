@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_project.R
@@ -59,14 +60,27 @@ class WifiNetworkAdapter(private val context: Context, private val wifiNetworks:
         val networkSSID = wifiNetworks[networkPosition].ssid
         val tvEnterPasswordForNetwork: TextView = dialog.findViewById(R.id.tvEnterPassword)
         val tvWithNetworkSSID = tvEnterPasswordForNetwork.text.toString() + networkSSID
+        val editTextEnterPassword: EditText = dialog.findViewById(R.id.editTextWifiPassword)
         tvEnterPasswordForNetwork.text = tvWithNetworkSSID
 
         dialogCancelBtn.setOnClickListener {
             dialog.dismiss()
         }
         dialogConnectBtn.setOnClickListener {
-            Log.e("onClickConnectBtn", "connected to wifi network $networkSSID")
-            dialog.dismiss()
+            val network = MainActivity.db.dao().getNetwork(networkSSID)
+            if (network == null) {
+                tvEnterPasswordForNetwork.text = "Cannot connect"
+                Log.e("Connect", "Cannot connect to wifi network $networkSSID")
+            } else {
+                if (editTextEnterPassword.text.toString() == network.password) {
+                    MainActivity.db.dao().updateNetworkConnectionStatus(true)
+                    Log.e("Connect", "Connected to wifi network $networkSSID")
+                    dialog.dismiss()
+                } else {
+                    tvEnterPasswordForNetwork.text = "Incorrect password"
+                    Log.e("Connect", "Incorrect password")
+                }
+            }
         }
 
         dialog.show()

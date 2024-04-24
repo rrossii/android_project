@@ -46,17 +46,6 @@ class MainActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.listOfNetworks)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-//        val w1 = WifiNetwork("Network 1", "pass1", false)
-//        val w2 = WifiNetwork("Network 2", "pass1", false)
-//        val w3 = WifiNetwork("Network 3", "pass1", false)
-//        val w4 = WifiNetwork("Network 4", "pass1", false)
-//        val w5 = WifiNetwork("Network 5", "pass1", false)
-//        val w6 = WifiNetwork("Network 6", "pass1", false)
-
-//        val wifiNetworks = listOf(
-//            w1, w2, w3, w4, w5, w6
-//        )
-
         val adapter = wifiNetworks?.let { WifiNetworkAdapter(this, it) }
         recyclerView.adapter = adapter
     }
@@ -162,6 +151,5 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.d("TEST", "Cannot delete ${net1.ssid}")
         }
-
     }
 }

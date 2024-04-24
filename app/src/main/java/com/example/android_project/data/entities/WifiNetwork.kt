@@ -9,7 +9,7 @@ data class WifiNetwork(
     @PrimaryKey(autoGenerate = false)
     val ssid: String,
     @ColumnInfo
-    val password: String, // make hash and logic
+    val password: String,
     @ColumnInfo
-    val connected: Boolean,
+    var connected: Boolean,
 )

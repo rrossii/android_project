@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.android_project.data.entities.WifiNetwork
 
 @Dao
@@ -17,6 +18,9 @@ interface WifiNetworkDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) // or output error
     fun insertNetwork(network: WifiNetwork)
+
+    @Query("UPDATE WifiNetwork SET connected=:connected")
+    fun updateNetworkConnectionStatus(connected: Boolean)
 
     @Delete
     fun deleteNetwork(network: WifiNetwork)
