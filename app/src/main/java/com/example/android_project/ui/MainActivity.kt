@@ -9,15 +9,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import com.example.android_project.api.ApiService
 import com.example.android_project.R
+import com.example.android_project.api.callbacks.WifiNetworkCallback
 import com.example.android_project.data.daos.WifiNetworkDao
 import com.example.android_project.data.WifiNetworkDatabase
 import com.example.android_project.data.entities.WifiNetwork
 import com.example.android_project.data.repositories.WifiNetworkRepository
+import com.example.android_project.data.server_responses.get_all_networks.GetAllNetworksResponse
+import com.example.android_project.data.server_responses.get_all_networks.WifiNetworkFromJSON
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        public lateinit var db: WifiNetworkDatabase
+        lateinit var db: WifiNetworkDatabase
             private set
     }
     private lateinit var testDb: WifiNetworkDatabase
@@ -36,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         testDB()
         initUI()
         initViewModel()
+
+        loadWifiNetworkData()
 
         addNetworkBtn.setOnClickListener {
             addNewNetwork()
@@ -151,5 +157,39 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.d("TEST", "Cannot delete ${net1.ssid}")
         }
+    }
+    private fun loadWifiNetworkData() {
+        Log.d("API", "load wifi networks data")
+        val apiService = ApiService()
+
+        apiService.getAllWifiNetworks(object: WifiNetworkCallback {
+            override fun onSuccess(networksResponse: GetAllNetworksResponse) {
+                networksResponse.record?.let { record ->
+                    record.networks.let { networks ->
+                        displayNetworks(networks)
+                    }
+                }
+            }
+
+            override fun onFailure() {
+                displayError()
+            }
+        })
+    }
+
+    private fun displayError() {
+        Log.d("API", "Error while loading networks data")
+    }
+
+    private fun displayNetworks(networks: ArrayList<WifiNetworkFromJSON>) {
+        for (network in networks) {
+            val ssid = network.ssid
+            if (ssid != null) {
+                Log.d("API", ssid)
+            } else {
+                Log.d("API", "network's ssid is null")
+            }
+        }
+
     }
 }
