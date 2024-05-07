@@ -33,9 +33,8 @@ class ApiService {
 
     fun getAllWifiNetworks(callback: WifiNetworkCallback) {
         api.getAllWifiNetworks(X_MASTER_KEY).enqueue(object: Callback<GetAllNetworksResponse> {
-            override fun onResponse(
-                call: Call<GetAllNetworksResponse>, response: Response<GetAllNetworksResponse>
-            ) {
+            override fun onResponse(call: Call<GetAllNetworksResponse>,
+                                    response: Response<GetAllNetworksResponse>) {
                 if (response.code() == 200 && response.body() != null) {
                     callback.onSuccess(response.body()!!)
                 } else {

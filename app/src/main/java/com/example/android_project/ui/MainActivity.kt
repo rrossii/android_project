@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_of_wifi_networks)
 
+        // init
         createDB()
         testDB()
         initUI()
@@ -162,22 +163,23 @@ class MainActivity : AppCompatActivity() {
         Log.d("API", "load wifi networks data")
         val apiService = ApiService()
 
-        apiService.getAllWifiNetworks(object: WifiNetworkCallback {
+        apiService.getAllWifiNetworks(object: WifiNetworkCallback { // тут оверайдимо поведінку колбек функції під кожен запит
             override fun onSuccess(networksResponse: GetAllNetworksResponse) {
                 networksResponse.record?.let { record ->
                     record.networks.let { networks ->
+                        saveNetworkDataFromServerToLocalDatabase(networks)
                         displayNetworks(networks)
                     }
                 }
             }
 
             override fun onFailure() {
-                displayError()
+                displayLoadingNetworksError()
             }
         })
     }
 
-    private fun displayError() {
+    private fun displayLoadingNetworksError() {
         Log.d("API", "Error while loading networks data")
     }
 
@@ -185,11 +187,21 @@ class MainActivity : AppCompatActivity() {
         for (network in networks) {
             val ssid = network.ssid
             if (ssid != null) {
-                Log.d("API", ssid)
+                Log.d("API", "Got $ssid")
             } else {
-                Log.d("API", "network's ssid is null")
+                Log.d("API", "Network's ssid is null")
             }
         }
+    }
 
+    private fun saveNetworkDataFromServerToLocalDatabase(networks: ArrayList<WifiNetworkFromJSON>) {
+        for (network in networks) {
+            val ssid = network.ssid
+            val password = network.password
+            val connected = network.connected
+            val networkToAdd = WifiNetwork(ssid!!, password!!, connected!!)
+            viewModel.insertNetwork(networkToAdd)
+
+        }
     }
 }
