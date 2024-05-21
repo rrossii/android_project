@@ -5,68 +5,51 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import com.example.android_project.api.ApiService
+import com.example.android_project.DiHelper
 import com.example.android_project.R
-import com.example.android_project.api.IDataSource
-import com.example.android_project.data.daos.WifiNetworkDao
 import com.example.android_project.data.WifiNetworkDatabase
 import com.example.android_project.data.entities.WifiNetwork
-import com.example.android_project.data.repositories.WifiNetworkRepository
-import com.example.android_project.data.server_responses.get_all_networks.GetAllNetworksResponse
 import com.example.android_project.data.server_responses.get_all_networks.WifiNetworkFromJSON
 
-class MainActivity : AppCompatActivity() {
-    companion object {
-        lateinit var db: WifiNetworkDatabase
-            private set
-    }
+class MainActivity : AppCompatActivity(), MainContract.View {
     private lateinit var testDb: WifiNetworkDatabase
-    private lateinit var dao: WifiNetworkDao
-    private lateinit var viewModel: WifiNetworkViewModel
-    private lateinit var factory: WifiNetworkViewModelFactory
-    private lateinit var repository: WifiNetworkRepository
 
+    private lateinit var presenter: MainContract.Presenter
     private lateinit var addNetworkBtn: Button
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: WifiNetworkAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_of_wifi_networks)
 
         // init
-        createDB()
         testDB()
         initUI()
-        initViewModel()
+        presenter = DiHelper.getMainPresenter(this, this)
 
-        loadWifiNetworkData()
+        presenter.loadWifiNetworkData() // from server
+        presenter.getAllNetworksData()
 
         addNetworkBtn.setOnClickListener {
-            addNewNetwork()
+            presenter.clickOnAddNetworkBtn()
         }
-
-        val wifiNetworks = viewModel.getAllNetworks()
-
-        val recyclerView: RecyclerView = findViewById(R.id.listOfNetworks)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        val adapter = wifiNetworks?.let { WifiNetworkAdapter(this, it) }
-        recyclerView.adapter = adapter
     }
+
     private fun initUI() {
         addNetworkBtn = findViewById(R.id.addNewNetworkBtn)
+
+        recyclerView = findViewById(R.id.listOfNetworks)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapter = WifiNetworkAdapter(this, emptyList())
+        recyclerView.adapter = adapter
     }
 
-    private fun initViewModel() {
-        repository = WifiNetworkRepository(db)
-        factory = WifiNetworkViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory).get(WifiNetworkViewModel::class.java)
-    }
-
-    private fun addNewNetwork() {
+    override fun navigateToAddNetworkScreen() {
         try {
             val intent = Intent(this, AddNetworkActivity::class.java)
             startActivity(intent)
@@ -76,16 +59,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createDB() {
-        db = Room.databaseBuilder(
-            applicationContext,
-            WifiNetworkDatabase::class.java,
-            "wifi_network_database"
-        ).allowMainThreadQueries().build()
-
-        dao = db.dao()
-
-        Log.d("TEST", "Database created")
+    override fun showNetworksDataInRecyclerView(wifiNetworks: List<WifiNetwork>?) {
+        adapter.updateData(wifiNetworks)
     }
 
     private fun testDB() {
@@ -115,7 +90,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TEST", "Got $network")
             }
         }
-
     }
 
     private fun testGet() {
@@ -159,31 +133,12 @@ class MainActivity : AppCompatActivity() {
             Log.d("TEST", "Cannot delete ${net1.ssid}")
         }
     }
-    private fun loadWifiNetworkData() {
-        Log.d("API", "load wifi networks data")
-        val apiService = ApiService()
 
-        apiService.getAllWifiNetworks(object: IDataSource.WifiNetworkCallback { // тут оверайдимо поведінку колбек функції під кожен запит
-            override fun onSuccess(networksResponse: GetAllNetworksResponse) {
-                networksResponse.record?.let { record ->
-                    record.networks.let { networks ->
-                        saveNetworkDataFromServerToLocalDatabase(networks)
-                        displayNetworks(networks)
-                    }
-                }
-            }
-
-            override fun onFailure() {
-                displayLoadingNetworksError()
-            }
-        })
-    }
-
-    private fun displayLoadingNetworksError() {
+    override fun logLoadingNetworksError() {
         Log.d("API", "Error while loading networks data")
     }
 
-    private fun displayNetworks(networks: ArrayList<WifiNetworkFromJSON>) {
+    override fun logReceivedNetworksFromServer(networks: ArrayList<WifiNetworkFromJSON>) {
         for (network in networks) {
             val ssid = network.ssid
             if (ssid != null) {
@@ -191,17 +146,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("API", "Network's ssid is null")
             }
-        }
-    }
-
-    private fun saveNetworkDataFromServerToLocalDatabase(networks: ArrayList<WifiNetworkFromJSON>) {
-        for (network in networks) {
-            val ssid = network.ssid
-            val password = network.password
-            val connected = network.connected
-            val networkToAdd = WifiNetwork(ssid!!, password!!, connected!!)
-            viewModel.insertNetwork(networkToAdd)
-
         }
     }
 }
