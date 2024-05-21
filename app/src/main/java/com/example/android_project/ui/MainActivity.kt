@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.example.android_project.api.ApiService
 import com.example.android_project.R
-import com.example.android_project.api.callbacks.WifiNetworkCallback
+import com.example.android_project.api.IDataSource
 import com.example.android_project.data.daos.WifiNetworkDao
 import com.example.android_project.data.WifiNetworkDatabase
 import com.example.android_project.data.entities.WifiNetwork
@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("API", "load wifi networks data")
         val apiService = ApiService()
 
-        apiService.getAllWifiNetworks(object: WifiNetworkCallback { // тут оверайдимо поведінку колбек функції під кожен запит
+        apiService.getAllWifiNetworks(object: IDataSource.WifiNetworkCallback { // тут оверайдимо поведінку колбек функції під кожен запит
             override fun onSuccess(networksResponse: GetAllNetworksResponse) {
                 networksResponse.record?.let { record ->
                     record.networks.let { networks ->
