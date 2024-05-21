@@ -1,5 +1,6 @@
 package com.example.android_project.api
 
+import com.example.android_project.DiHelper
 import com.example.android_project.data.server_responses.get_all_networks.GetAllNetworksResponse
 import retrofit2.Call
 import retrofit2.Callback
@@ -8,7 +9,7 @@ import retrofit2.Response
 class ApiService : IDataSource {
     var api: Api
     val X_MASTER_KEY: String = "\$2a\$10\$pGc3gmiYhFM7FrJ3uuCATOUpCozl8nK4n0qtmzchZOHTsdohjLrYO"
-    val retrofitHelper: RetrofitApiHelper = RetrofitApiHelper()
+    val retrofitHelper: RetrofitApiHelper = DiHelper.getRetrofitHelper()
 
     init {
         retrofitHelper.init()

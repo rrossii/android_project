@@ -2,7 +2,7 @@ package com.example.android_project.api
 
 import com.example.android_project.data.server_responses.get_all_networks.GetAllNetworksResponse
 
-interface IDataSource {
+interface IDataSource { // server operations
     fun getAllWifiNetworks(callback: WifiNetworkCallback)
 
     interface WifiNetworkCallback {
