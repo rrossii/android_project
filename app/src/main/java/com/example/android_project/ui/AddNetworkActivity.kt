@@ -27,18 +27,16 @@ class AddNetworkActivity : AppCompatActivity(), AddNetworkContract.View {
 //        presenter = DiHelper.getAddNetworkPresenter(this, applicationContext)
 
         cancelBtn.setOnClickListener {
-            presenter.clickOnCancelBtn()
+            setResult(RESULT_OK)
+            finish()
         }
         saveBtn.setOnClickListener {
             val ssid = ssidEditText.text.toString()
             val password = passwordEditText.text.toString()
             val networkToAdd = WifiNetwork(ssid, password, false)
             presenter.clickOnSaveNetworkBtn(networkToAdd)
-
-//            if (ssid.isEmpty()) {
-//                Toast.makeText(applicationContext, "Please enter a ssid", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
+            setResult(RESULT_OK)
+            finish()
         }
     }
     private fun initUI() {
@@ -46,15 +44,5 @@ class AddNetworkActivity : AppCompatActivity(), AddNetworkContract.View {
         saveBtn = findViewById(R.id.newNetworkSaveButton)
         ssidEditText = findViewById(R.id.editTextNewNetworkSsid)
         passwordEditText = findViewById(R.id.editTextNewNetworkPassword)
-    }
-
-    override fun navigateToMainScreen() {
-        try {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("AddNetworkActivity", "Error starting MainActivity: ${e.message}")
-            e.printStackTrace()
-        }
     }
 }

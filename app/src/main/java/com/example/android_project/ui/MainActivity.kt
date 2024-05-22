@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,17 +23,25 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     private lateinit var addNetworkBtn: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: WifiNetworkAdapter
+    private lateinit var addNetworkLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_of_wifi_networks)
+
+        addNetworkLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result ->
+            if (result.resultCode == RESULT_OK) {
+                presenter.getAllNetworksData()
+            }
+        }
 
         // init
         testDB()
         initUI()
         presenter = DiHelper.getMainPresenter(this, this)
 
-        presenter.loadWifiNetworkData() // from server
+        presenter.loadWifiNetworkData() // from server, пізніше перемістити щоб дані не загружались лише один раз
         presenter.getAllNetworksData()
 
         addNetworkBtn.setOnClickListener {
@@ -52,7 +62,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun navigateToAddNetworkScreen() {
         try {
             val intent = Intent(this, AddNetworkActivity::class.java)
-            startActivity(intent)
+            addNetworkLauncher.launch(intent)
         } catch (e: Exception) {
             Log.e("MainActivity", "Error starting AddNetworkActivity: ${e.message}")
             e.printStackTrace()
@@ -62,7 +72,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun showNetworksDataInRecyclerView(wifiNetworks: List<WifiNetwork>?) {
         adapter.updateData(wifiNetworks)
     }
-
     private fun testDB() {
         testDb = Room.databaseBuilder(
             applicationContext,

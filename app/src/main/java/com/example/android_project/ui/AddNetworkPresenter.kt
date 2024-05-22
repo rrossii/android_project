@@ -8,13 +8,9 @@ class AddNetworkPresenter(val view: AddNetworkContract.View, val applicationCont
     : AddNetworkContract.Presenter {
 
     private val repository: MainContract.Repository = DiHelper.getRepository(applicationContext)
-    override fun clickOnCancelBtn() {
-        view.navigateToMainScreen()
-    }
 
     override fun clickOnSaveNetworkBtn(networkToAdd: WifiNetwork) {
         repository.insertNetworkToDb(networkToAdd)
-        view.navigateToMainScreen()
     }
 
 }
